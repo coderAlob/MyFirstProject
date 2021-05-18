@@ -5,7 +5,7 @@
 
 <script>
   export default {
-    el: '#app',
+    name: 'app',
     components: {
 
     }
