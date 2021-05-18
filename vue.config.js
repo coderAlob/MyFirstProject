@@ -1,7 +1,13 @@
 module.exports ={
-  devServer: {
-    public: 'http://123.127.0.24',
-    hot:true,
-    disableHostCheck: true
+  configureWebpack: {
+    resolve: {
+      alias: {
+        'assets': '@/assets',
+        'common': '@/common',
+        'components': '@/components',
+        'network': '@/network',
+        'views': '@/views'
+      }
+    }
   }
 }
