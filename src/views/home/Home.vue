@@ -1,27 +1,44 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <home-swiper :banners="banners"/>
-    <home-recommend-view :recommends="recommends"/>
-    <feature-view/>
-    <tab-controller class="tab-control" :titles="['流行', '新款', '精选']" @tabClick="tabClick"/>
-    <goods-list :goods="showGoods"/>
+    <scroll class="content" ref="scroll">
+      <home-swiper :banners="banners"/>
+      <home-recommend-view :recommends="recommends"/>
+      <feature-view/>
+      <tab-controller class="tab-control" :titles="['流行', '新款', '精选']" @tabClick="tabClick"/>
+      <goods-list :goods="showGoods"/>
+    </scroll>
+<!--    .native修饰符： 监听组件的原生事件-->
+    <back-top @click.native="backClick"/>
 
   </div>
 </template>
 
 <script>
-  import NavBar from "components/common/navbar/NavBar";
   import HomeSwiper from "./childComponents/HomeSwiper";
   import HomeRecommendView from "./childComponents/HomeRecommendView";
   import FeatureView from "./childComponents/FeatureView";
+
+  import NavBar from "components/common/navbar/NavBar";
   import TabController from "components/content/tabController/TabController";
   import GoodsList from "components/content/goods/GoodsList";
+  import Scroll from "components/common/scroll/Scroll";
+  import BackTop from "components/content/backtop/BackTop";
 
   import {getHomeMultidata,getHomeGoods} from "network/home";
 
   export default {
     name: "Home",
+    components: {
+      NavBar,
+      HomeSwiper,
+      HomeRecommendView,
+      FeatureView,
+      TabController,
+      GoodsList,
+      Scroll,
+      BackTop
+    },
     data (){
       return {
         banners: [],
@@ -39,14 +56,7 @@
         return this.goods[this.currentType].list
       }
     },
-    components: {
-      NavBar,
-      HomeSwiper,
-      HomeRecommendView,
-      FeatureView,
-      TabController,
-      GoodsList,
-    },
+
     created() {
       //  1.请求轮播图数据
       this.getHomeMultidata()
@@ -94,6 +104,9 @@
             this.currentType = 'pop'
           }
         }
+      },
+      backClick() {
+        this.$refs.scroll.scroll.scrollTo(0,0,1000)
       }
     }
   }
@@ -102,6 +115,9 @@
 <style scoped>
   #home {
     padding-top: 44px;
+    /*vh: view point 视口高度*/
+    height: 100vh;
+    position: relative;
   }
 
   .home-nav {
@@ -120,5 +136,13 @@
     position: sticky;
     top: 44px;
     z-index: 8;
+  }
+
+  .content {
+    /*height: calc(100vh - 93px);*/
+    overflow: hidden;
+    position: absolute;
+    top: 44px;
+    bottom: 49px;
   }
 </style>
