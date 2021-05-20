@@ -1,7 +1,12 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <scroll class="content" ref="scroll">
+    <scroll
+      class="content"
+      ref="scroll"
+      :probe-type="3"
+      :pull-up-load="true"
+      @scroll="contentScroll" @pullingUp="loadMore" >
       <home-swiper :banners="banners"/>
       <home-recommend-view :recommends="recommends"/>
       <feature-view/>
@@ -9,7 +14,7 @@
       <goods-list :goods="showGoods"/>
     </scroll>
 <!--    .native修饰符： 监听组件的原生事件-->
-    <back-top @click.native="backClick"/>
+    <back-top @click.native="backClick" v-show="isShowBackTop"/>
 
   </div>
 </template>
@@ -48,7 +53,8 @@
           'new': {page: 0, list: []},
           'sell': {page: 0, list: []},
         },
-        currentType: 'pop'
+        currentType: 'pop',
+        isShowBackTop: false
       }
     },
     computed: {
@@ -78,6 +84,7 @@
       getHomeGoods(type) {
         const page = this.goods[type].page +1
         getHomeGoods(type, page).then(res => {
+          //将获取到的商品信息保存到本地
           this.goods[type].list.push(...res.data.data.list)
           this.goods[type].page +=1;
         })
@@ -106,8 +113,27 @@
         }
       },
       backClick() {
-        this.$refs.scroll.scroll.scrollTo(0,0,1000)
+        //通过this.$refs.ref值获取scroll组件对象
+        //scrollTo(x,y,time)
+        this.$refs.scroll.scroll.scrollTo(0,0,500)
+      },
+      contentScroll(position) {
+        this.isShowBackTop = (- position.y) >1000
+      },
+      loadMore() {
+        this.getHomeGoods(this.currentType)
+        setTimeout(() => {
+          this.$refs.scroll.scroll.finishPullUp()
+        },1500)
       }
+    },
+
+    mounted() {
+      //监听图片加载，并实时刷新可滚动区域高度(scrollerHeight)
+      //使用$bus事件总线，对图片刷新进行事件监听
+      this.$bus.$on('itemImageLoad', () => {
+        this.$refs.scroll && this.$refs.scroll.refresh()
+      })
     }
   }
 </script>

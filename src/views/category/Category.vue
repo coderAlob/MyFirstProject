@@ -125,24 +125,24 @@
         pullUpLoad: true,
         pullDownRefresh: true
       })
-      //监听滚动位置
-      this.scroll.on('scroll', (position) => {
-        // console.log(position);
-      })
-      //上拉加载更多
-      this.scroll.on('pullingUp', () => {
-        console.log('上拉加载更多');
-        setTimeout(() => {
-          this.scroll.finishPullUp()
-        },1500)
-      })
-      //下拉刷新
-      this.scroll.on('pullingDown', () => {
-        console.log('上拉加载更多');
-        setTimeout(() => {
-          this.scroll.finishPullDown()
-        },1500)
-      })
+      // //监听滚动位置
+      // this.scroll.on('scroll', (position) => {
+      //   // console.log(position);
+      // })
+      // //上拉加载更多
+      // this.scroll.on('pullingUp', () => {
+      //   console.log('上拉加载更多');
+      //   setTimeout(() => {
+      //     this.scroll.finishPullUp()
+      //   },1500)
+      // })
+      // //下拉刷新
+      // this.scroll.on('pullingDown', () => {
+      //   console.log('上拉加载更多');
+      //   setTimeout(() => {
+      //     this.scroll.finishPullDown()
+      //   },1500)
+      // })
     }
   }
 </script>
