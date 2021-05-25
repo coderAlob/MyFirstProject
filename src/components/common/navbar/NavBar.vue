@@ -17,6 +17,7 @@
     display: flex;
     height: 44px;
     line-height: 44px;
+    box-shadow: 0 1px 1px 1px #eee;
   }
   .left, .right {
     width: 60px;

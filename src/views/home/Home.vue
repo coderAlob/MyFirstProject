@@ -1,16 +1,25 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
+    <tab-controller :titles="['流行', '新款', '精选']"
+                    @tabClick="tabClick"
+                    ref="tabController1"
+                    v-show="isTabFixed"
+                    class="tabControl"/>
     <scroll
       class="content"
       ref="scroll"
       :probe-type="3"
       :pull-up-load="true"
       @scroll="contentScroll" @pullingUp="loadMore" >
-      <home-swiper :banners="banners"/>
+      <home-swiper :banners="banners"
+                   @swiperImageLoad="swiperImageLoad"/>
       <home-recommend-view :recommends="recommends"/>
       <feature-view/>
-      <tab-controller class="tab-control" :titles="['流行', '新款', '精选']" @tabClick="tabClick"/>
+      <tab-controller class="tab-control"
+                      :titles="['流行', '新款', '精选']"
+                      @tabClick="tabClick"
+                      ref="tabController2"/>
       <goods-list :goods="showGoods"/>
     </scroll>
 <!--    .native修饰符： 监听组件的原生事件-->
@@ -31,6 +40,7 @@
   import BackTop from "components/content/backtop/BackTop";
 
   import {getHomeMultidata,getHomeGoods} from "network/home";
+  import {debounce} from "common/utils";
 
   export default {
     name: "Home",
@@ -54,7 +64,10 @@
           'sell': {page: 0, list: []},
         },
         currentType: 'pop',
-        isShowBackTop: false
+        isShowBackTop: false,
+        tabOffsetTop: 0,
+        isTabFixed: false,
+        saveY: 0
       }
     },
     computed: {
@@ -70,6 +83,13 @@
       this.getHomeGoods('pop')
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
+    },
+    activated() {
+      this.$refs.scroll.scroll.scrollTo(0, this.saveY,0)
+      this.$refs.scroll.refresh()
+    },
+    deactivated() {
+      this.saveY = this.$refs.scroll.scroll.y
     },
     methods: {
       /*
@@ -111,6 +131,8 @@
             this.currentType = 'pop'
           }
         }
+        this.$refs.tabController1.currentIndex = index;
+        this.$refs.tabController2.currentIndex = index;
       },
       backClick() {
         //通过this.$refs.ref值获取scroll组件对象
@@ -118,29 +140,42 @@
         this.$refs.scroll.scroll.scrollTo(0,0,500)
       },
       contentScroll(position) {
+        //1.判断BackTop图标是否显示
         this.isShowBackTop = (- position.y) >1000
+
+        //2.决定tabController是否吸顶
+        this.isTabFixed = ( - position.y) >= this.tabOffsetTop
       },
       loadMore() {
         this.getHomeGoods(this.currentType)
-        setTimeout(() => {
-          this.$refs.scroll.scroll.finishPullUp()
-        },1500)
+        this.$refs.scroll && this.$refs.scroll.scroll.finishPullUp()
+      },
+      swiperImageLoad() {
+        //  获取tabController的tabOffsetTop
+        this.tabOffsetTop =this.$refs.tabController2.$el.offsetTop
       }
     },
 
     mounted() {
       //监听图片加载，并实时刷新可滚动区域高度(scrollerHeight)
-      //使用$bus事件总线，对图片刷新进行事件监听
+      //1.使用$bus事件总线，对图片刷新进行事件监听
+      // this.$bus.$on('itemImageLoad', () => {
+      //   this.$refs.scroll && this.$refs.scroll.refresh()
+      // })
+
+    //  2.使用防抖函数，避免refresh多次调用
+      const refresh = debounce(this.$refs.scroll && this.$refs.scroll.refresh,500)
       this.$bus.$on('itemImageLoad', () => {
-        this.$refs.scroll && this.$refs.scroll.refresh()
+        refresh()
       })
+
+
     }
   }
 </script>
 
 <style scoped>
   #home {
-    padding-top: 44px;
     /*vh: view point 视口高度*/
     height: 100vh;
     position: relative;
@@ -149,18 +184,18 @@
   .home-nav {
     background-color: var(--color-tint);
     color: #ffffff;
-    position: fixed;
-    left: 0;
-    top: 0;
-    right: 0;
-    z-index: 9;
+    /*position: fixed;*/
+    /*left: 0;*/
+    /*top: 0;*/
+    /*right: 0;*/
+    /*z-index: 9;*/
   }
 
   .tab-control {
     /*还未到达指定位置时，position: fixed;  当到达指定位置时则会变成 position: static;*/
     /*ie浏览器目前不兼容该属性*/
-    position: sticky;
-    top: 44px;
+    /*position: sticky;*/
+    /*top: 44px;*/
     z-index: 8;
   }
 
@@ -170,5 +205,10 @@
     position: absolute;
     top: 44px;
     bottom: 49px;
+  }
+
+  .tabControl {
+    position: relative;
+    z-index: 9;
   }
 </style>

@@ -46,7 +46,7 @@
     },
     methods: {
       refresh() {
-        this.scroll && this.scroll.refresh()
+        this.scroll.refresh()
       }
     }
   }
