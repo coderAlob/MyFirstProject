@@ -67,7 +67,8 @@
         isShowBackTop: false,
         tabOffsetTop: 0,
         isTabFixed: false,
-        saveY: 0
+        saveY: 0,
+        itemListener: null
       }
     },
     computed: {
@@ -89,7 +90,10 @@
       this.$refs.scroll.refresh()
     },
     deactivated() {
+      //保存离开时的位置y
       this.saveY = this.$refs.scroll.scroll.y
+      //离开时取消事件总线的监听
+      this.$bus.$off('itemImageLoad', this.itemListener)
     },
     methods: {
       /*
@@ -165,9 +169,10 @@
 
     //  2.使用防抖函数，避免refresh多次调用
       const refresh = debounce(this.$refs.scroll && this.$refs.scroll.refresh,500)
-      this.$bus.$on('itemImageLoad', () => {
+      this.itemListener = () => {
         refresh()
-      })
+      }
+      this.$bus.$on('itemImageLoad', this.itemListener)
 
 
     }

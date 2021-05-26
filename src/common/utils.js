@@ -12,6 +12,7 @@ export function debounce(func,delay){
   }
 }
 
+//对从后台请求的时间戳进行一定程度的格式化
 export function formatDate(date, fmt) {
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
@@ -32,7 +33,9 @@ export function formatDate(date, fmt) {
   return fmt;
 };
 
+//实现对传进来的时间进行处理，使输出的时间都为两位数字输出
 function padLeftZero (str) {
+  //substr(length)替换的长度
   return ('00' + str).substr(str.length);
 };
 
