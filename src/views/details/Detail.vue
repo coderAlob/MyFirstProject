@@ -1,7 +1,6 @@
 <template>
   <div id="detail">
     <detail-nav-bar class="detail-nav-bar" @titleClick="titleClick" ref="navBar"/>
-    <div>{{$store.state.cartList.length}}</div>
     <scroll class="content" ref="scroll" @scroll="contentScroll" :probe-type="3">
       <detail-swiper :top-images="topImages"/>
       <detail-base-info :goods="goods"/>
@@ -162,10 +161,10 @@
         product.desc = this.goods.desc
         product.title = this.goods.title
         product.price = this.goods.nowPrice
-        product.iid = this.goods.iid
+        product.iid = this.iid
 
         //2.将商品添加到购物车中
-        this.$store.commit('addToCart',product)
+        this.$store.dispatch('addCart', product)
       }
     }
   }
