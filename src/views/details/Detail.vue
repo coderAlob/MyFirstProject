@@ -1,15 +1,18 @@
 <template>
   <div id="detail">
-    <detail-nav-bar class="detail-nav-bar"/>
-    <scroll class="content" ref="scroll">
+    <detail-nav-bar class="detail-nav-bar" @titleClick="titleClick" ref="navBar"/>
+    <scroll class="content" ref="scroll" @scroll="contentScroll" :probe-type="3">
       <detail-swiper :top-images="topImages"/>
       <detail-base-info :goods="goods"/>
       <detail-shop-info :shop="shop"/>
       <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"/>
-      <detail-param-info :param-info="paramInfo"/>
-      <detail-comment-info :comment-info="commentInfo"/>
-      <goods-list :goods="recommendInfo" @imageLoad="imageLoad"/>
+      <detail-param-info :param-info="paramInfo" ref="param"/>
+      <detail-comment-info :comment-info="commentInfo" ref="comment"/>
+      <goods-list :goods="recommendInfo" @imageLoad="imageLoad" ref="recommend"/>
     </scroll>
+
+    <back-top @click.native="backClick" v-show="isBackShow"/>
+    <detail-bottom-bar/>
   </div>
 </template>
 
@@ -22,10 +25,13 @@
   import DetailParamInfo from "./childComponents/DetailParamInfo";
   import DetailCommentInfo from "./childComponents/DetailCommentInfo";
   import GoodsList from "components/content/goods/GoodsList";
+  import DetailBottomBar from "./childComponents/DetailBottomBar";
+  import BackTop from "components/content/backtop/BackTop";
 
   import Scroll from "components/common/scroll/Scroll";
 
   import {getDetail, Goods, Shop, GoodsParam, getRecommends} from "network/detail";
+  import {debounce} from "common/utils";
 
   export default {
     name: "Detail",
@@ -38,7 +44,9 @@
       DetailGoodsInfo,
       DetailParamInfo,
       DetailCommentInfo,
-      GoodsList
+      GoodsList,
+      DetailBottomBar,
+      BackTop
     },
     data() {
       return {
@@ -49,7 +57,11 @@
         detailInfo: {},
         paramInfo: {},
         commentInfo: {},
-        recommendInfo: []
+        recommendInfo: [],
+        isBackShow: false,
+        themeTopYs: [0,0,0,0],
+        getThemeTopYs: null,
+        currentIndex: 0
       }
     },
     created() {
@@ -71,17 +83,74 @@
         this.paramInfo = new GoodsParam(res.data.result.itemParams.info,res.data.result.itemParams.rule)
         //获取评论信息
         if(res.data.result.rate.cRate !=0 ){
-          this.commentInfo = res.data.result.rate.list[0]}
-        })
+          this.commentInfo = res.data.result.rate.list[0]
+        }
+      })
 
-    //  获取评论信息
+      // 获取评论信息
       getRecommends().then(res => {
         this.recommendInfo = res.data.data.list
       })
+
+
+       this.getThemeTopYs = debounce(() => {
+        this.themeTopYs.splice(0,1,0)
+        this.themeTopYs.splice(1,1,this.$refs.param.$el.offsetTop)
+        this.themeTopYs.splice(2,1,this.$refs.comment.$el.offsetTop)
+        this.themeTopYs.splice(3,1,this.$refs.recommend.$el.offsetTop)
+      },500)
+      //获取各部分的offsetTop值
+      //第一种方法
+      //失败原因：所选中的对象还未渲染到DOM中，获取不到数据，会出现undefined
+      // this.themeTopYs.push(0)
+      // this.themeTopYs.push(this.$refs.param.$el.offsetTop)
+      // this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+      // this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+
+      //第二种方法
+      //失败原因：this.$nextTick(回调函数)会在DOM渲染完成后再对内部的回调函数进行执行，但是如图片等，图片不一定加载完成，导致跳转位置不正确
+      // this.$nextTick(() => {
+      //   this.themeTopYs.push(0)
+      //   this.themeTopYs.push(this.$refs.param.$el.offsetTop)
+      //   this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+      //   this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+      //   console.log(this.themeTopYs);
+      // })
+    },
+    //第三种方法
+    //使用生命周期函数updated，在页面数据发生更新时，就对保存位置信息的数组进行一次更新
+    //但是更新次数过于频繁，浪费大量性能，不建议使用（因此使用防抖函数对该步骤进行处理）
+    updated() {
+      // this.themeTopYs.splice(0,1,0)
+      // this.themeTopYs.splice(1,1,this.$refs.param.$el.offsetTop)
+      // this.themeTopYs.splice(2,1,this.$refs.comment.$el.offsetTop)
+      // this.themeTopYs.splice(3,1,this.$refs.recommend.$el.offsetTop)
+      // console.log(this.themeTopYs);
+
+      //第四种方法：使用防抖函数
+      this.getThemeTopYs()
     },
     methods: {
       imageLoad() {
         this.$refs.scroll && this.$refs.scroll.refresh()
+      },
+      backClick() {
+        this.$refs.scroll.scroll.scrollTo(0,0,500)
+      },
+      contentScroll(position) {
+        this.isBackShow = (-position.y) >1000
+
+        for(let i =0; i < this.themeTopYs.length; i ++){
+          if(this.currentIndex != i && (i < this.themeTopYs.length -1 && -position.y >= this.themeTopYs[i] && -position.y <= this.themeTopYs[i+1])
+            || (i == this.themeTopYs.length -1 && -position.y >= this.themeTopYs[i])){
+            this.currentIndex = i
+            this.$refs.navBar.currentIndex = this.currentIndex
+          }
+        }
+      },
+      //点击顶部标签，跳转到响应的位置
+      titleClick(index){
+        this.$refs.scroll.scroll.scrollTo(0, -this.themeTopYs[index],500)
       }
     }
   }
@@ -108,6 +177,6 @@
     /*overflow: hidden;*/
     position: absolute;
     top: 44px;
-    bottom: 0;
+    bottom: 49px;
   }
 </style>

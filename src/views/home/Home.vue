@@ -141,7 +141,7 @@
       backClick() {
         //通过this.$refs.ref值获取scroll组件对象
         //scrollTo(x,y,time)
-        this.$refs.scroll.scroll.scrollTo(0,0,500)
+        this.$refs.scroll.scroll.scrollTo(0,0,700)
       },
       contentScroll(position) {
         //1.判断BackTop图标是否显示
@@ -172,6 +172,7 @@
       this.itemListener = () => {
         refresh()
       }
+      //对itemImageLoad进行监听，并执行itemListener回调函数
       this.$bus.$on('itemImageLoad', this.itemListener)
 
 
