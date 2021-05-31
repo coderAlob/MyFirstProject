@@ -1,6 +1,7 @@
 <template>
   <div id="detail">
     <detail-nav-bar class="detail-nav-bar" @titleClick="titleClick" ref="navBar"/>
+    <div>{{$store.state.cartList.length}}</div>
     <scroll class="content" ref="scroll" @scroll="contentScroll" :probe-type="3">
       <detail-swiper :top-images="topImages"/>
       <detail-base-info :goods="goods"/>
@@ -12,7 +13,7 @@
     </scroll>
 
     <back-top @click.native="backClick" v-show="isBackShow"/>
-    <detail-bottom-bar/>
+    <detail-bottom-bar @addToCart="addToCart"/>
   </div>
 </template>
 
@@ -139,7 +140,7 @@
       },
       contentScroll(position) {
         this.isBackShow = (-position.y) >1000
-
+        //可以往数组里添加一个js能表示的最大数（Number.MAX_Value），省去多写出来的大于数组最后一个元素的比较步骤
         for(let i =0; i < this.themeTopYs.length; i ++){
           if(this.currentIndex != i && (i < this.themeTopYs.length -1 && -position.y >= this.themeTopYs[i] && -position.y <= this.themeTopYs[i+1])
             || (i == this.themeTopYs.length -1 && -position.y >= this.themeTopYs[i])){
@@ -151,6 +152,20 @@
       //点击顶部标签，跳转到响应的位置
       titleClick(index){
         this.$refs.scroll.scroll.scrollTo(0, -this.themeTopYs[index],500)
+      },
+
+      //点击添加到购物车，将当前商品添加到购物车中
+      addToCart() {
+        const product = {}
+        //1.获取购物车需要展示的信息
+        product.image = this.topImages[0]
+        product.desc = this.goods.desc
+        product.title = this.goods.title
+        product.price = this.goods.nowPrice
+        product.iid = this.goods.iid
+
+        //2.将商品添加到购物车中
+        this.$store.commit('addToCart',product)
       }
     }
   }
