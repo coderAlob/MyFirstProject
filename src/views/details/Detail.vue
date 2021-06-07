@@ -1,6 +1,7 @@
 <template>
   <div id="detail">
     <detail-nav-bar class="detail-nav-bar" @titleClick="titleClick" ref="navBar"/>
+    <tip class="tip" v-show="isTipShow"><div>加入购物车成功</div></tip>
     <scroll class="content" ref="scroll" @scroll="contentScroll" :probe-type="3">
       <detail-swiper :top-images="topImages"/>
       <detail-base-info :goods="goods"/>
@@ -10,7 +11,6 @@
       <detail-comment-info :comment-info="commentInfo" ref="comment"/>
       <goods-list :goods="recommendInfo" @imageLoad="imageLoad" ref="recommend"/>
     </scroll>
-
     <back-top @click.native="backClick" v-show="isBackShow"/>
     <detail-bottom-bar @addToCart="addToCart"/>
   </div>
@@ -27,6 +27,7 @@
   import GoodsList from "components/content/goods/GoodsList";
   import DetailBottomBar from "./childComponents/DetailBottomBar";
   import BackTop from "components/content/backtop/BackTop";
+  import Tip from "components/common/tip/Tip"
 
   import Scroll from "components/common/scroll/Scroll";
 
@@ -46,7 +47,8 @@
       DetailCommentInfo,
       GoodsList,
       DetailBottomBar,
-      BackTop
+      BackTop,
+      Tip
     },
     data() {
       return {
@@ -61,7 +63,9 @@
         isBackShow: false,
         themeTopYs: [0,0,0,0],
         getThemeTopYs: null,
-        currentIndex: 0
+        currentIndex: 0,
+        isTipShow: false,
+        timer: null
       }
     },
     created() {
@@ -165,6 +169,13 @@
 
         //2.将商品添加到购物车中
         this.$store.dispatch('addCart', product)
+
+        //3.显示提示信息
+        clearTimeout(timer)
+        this.isTipShow = true
+        let timer = setTimeout(() => {
+          this.isTipShow = false
+        },1500)
       }
     }
   }
@@ -188,9 +199,18 @@
   }
 
   .content {
-    /*overflow: hidden;*/
+    overflow: hidden;
     position: absolute;
     top: 44px;
     bottom: 49px;
+  }
+
+  .tip {
+    position: absolute;
+    top: 45%;
+    left: 25%;
+    right: 25%;
+    margin: 0 auto;
+    z-index: 10;
   }
 </style>

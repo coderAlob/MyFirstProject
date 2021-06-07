@@ -49,6 +49,7 @@
     display: flex;
     font-size: 0;
     padding: 5px;
+    background-color: white;
   }
   .item-selector {
     width: 14%;

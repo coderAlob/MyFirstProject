@@ -1,6 +1,6 @@
 <template>
   <div class="cart-list">
-    <cart-list-item v-for="(item,index) in $store.state.cartList" :product="item" :key="index"></cart-list-item>
+    <cart-list-item v-for="(item,index) in $store.state.cartList" :product="item" :key="index"/>
   </div>
 </template>
 
@@ -11,8 +11,8 @@
     name: "CartList",
     components: {
       BScroll,
-      CartListItem
-    }
+      CartListItem,
+    },
   }
 </script>
 
