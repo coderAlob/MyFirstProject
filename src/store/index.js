@@ -17,6 +17,12 @@ export default new Vuex.Store({
     addToCart(state, payload) {
       payload.checked = true
       state.cartList.push(payload)
+    },
+    pauseSelectAll(state) {
+      state.cartList.forEach(item => item.checked = false)
+    },
+    selectAll(state) {
+      state.cartList.forEach(item => item.checked = true)
     }
   },
   actions: {
