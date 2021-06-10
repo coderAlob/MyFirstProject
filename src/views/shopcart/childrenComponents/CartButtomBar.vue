@@ -7,7 +7,7 @@
 
     <div class="totalPrice">合计：{{totalPrice}}</div>
 
-    <div class="calculate">
+    <div class="calculate" @click="calcClick">
       结算({{checkItem}})
     </div>
   </div>
@@ -48,6 +48,13 @@
           this.$store.commit('pauseSelectAll')
         }else {
           this.$store.commit('selectAll')
+        }
+      },
+      calcClick() {
+        if(!this.isSelectAll) {
+          this.$toast.show('请选择要购买的商品')
+        }else {
+          this.$toast.show('跳转至结算页面')
         }
       }
     }

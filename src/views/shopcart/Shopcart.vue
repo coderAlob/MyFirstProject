@@ -5,11 +5,12 @@
 
 
 <!--    购物车商品列表-->
+    <div class="tips" v-if="isTipShow">快去选购喜欢的物品吧</div>
     <scroll
       class="content"
       ref="scroll"
       :pull-up-load="true"
-      @pullingUp="refresh">
+      @pullingUp="refresh" v-else>
       <cart-list></cart-list>
     </scroll>
 
@@ -38,6 +39,15 @@
       refresh() {
         this.$refs.scroll.scroll.refresh()
         this.$refs.scroll.scroll.finishPullUp()
+      },
+    },
+    computed: {
+      isTipShow() {
+        if(this.$store.state.cartList.length == 0) {
+          return true
+        }else {
+          return false
+        }
       }
     }
   }
@@ -65,5 +75,11 @@
     bottom: 49px;
     left: 0;
     right: 0;
+  }
+
+  .tips {
+    line-height: calc(90vh - 300px);
+    margin: 10px auto;
+    text-align: center;
   }
 </style>

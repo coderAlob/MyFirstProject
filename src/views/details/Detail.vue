@@ -1,7 +1,8 @@
 <template>
   <div id="detail">
     <detail-nav-bar class="detail-nav-bar" @titleClick="titleClick" ref="navBar"/>
-    <tip class="tip" v-show="isTipShow"><div>加入购物车成功</div></tip>
+<!--    <tip class="tip" v-show="isTipShow"><div>加入购物车成功</div></tip>-->
+<!--    <toast :show="isToastShow" :message="message"></toast>-->
     <scroll class="content" ref="scroll" @scroll="contentScroll" :probe-type="3">
       <detail-swiper :top-images="topImages"/>
       <detail-base-info :goods="goods"/>
@@ -28,6 +29,7 @@
   import DetailBottomBar from "./childComponents/DetailBottomBar";
   import BackTop from "components/content/backtop/BackTop";
   import Tip from "components/common/tip/Tip"
+  import Toast from "components/common/toast/Toast";
 
   import Scroll from "components/common/scroll/Scroll";
 
@@ -48,7 +50,8 @@
       GoodsList,
       DetailBottomBar,
       BackTop,
-      Tip
+      Tip,
+      Toast
     },
     data() {
       return {
@@ -64,7 +67,10 @@
         themeTopYs: [0,0,0,0],
         getThemeTopYs: null,
         currentIndex: 0,
-        isTipShow: false,
+        // isTipShow: false,
+        isToastShow: false,
+        message: '',
+        show: false,
         timer: null
       }
     },
@@ -168,14 +174,19 @@
         product.iid = this.iid
 
         //2.将商品添加到购物车中
-        this.$store.dispatch('addCart', product)
+        this.$store.dispatch('addCart', product).then(res => {
+
+          this.$toast.show(res,1000)
+        })
 
         //3.显示提示信息
-        clearTimeout(timer)
-        this.isTipShow = true
-        let timer = setTimeout(() => {
-          this.isTipShow = false
-        },1500)
+        // clearTimeout(timer)
+        // this.isTipShow = true
+        // let timer = setTimeout(() => {
+        //   this.isTipShow = false
+        // },1500)
+
+        //3.显示提示信息
       }
     }
   }
@@ -205,12 +216,12 @@
     bottom: 49px;
   }
 
-  .tip {
-    position: absolute;
-    top: 45%;
-    left: 25%;
-    right: 25%;
-    margin: 0 auto;
-    z-index: 10;
-  }
+  /*.tip {*/
+  /*  position: absolute;*/
+  /*  top: 45%;*/
+  /*  left: 25%;*/
+  /*  right: 25%;*/
+  /*  margin: 0 auto;*/
+  /*  z-index: 10;*/
+  /*}*/
 </style>
