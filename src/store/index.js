@@ -41,13 +41,13 @@ export default new Vuex.Store({
           // oldProduct.count += 1
           //回到mutations中进行对state中的数据进行修改
           context.commit('addCount', oldProduct)
-          resolve('商品数量+1')
+          resolve('该商品已在购物车中')
         }else{
           //如果商品不存在，则将数量设为1，并将该商品添加到购物车对象数组中
           payload.count = 1
           // context.state.cartList.push(payload)
           context.commit('addToCart', payload)
-          resolve('添加新商品');
+          resolve('加入购物车成功');
         }
       })
     }

@@ -137,6 +137,8 @@
         }
         this.$refs.tabController1.currentIndex = index;
         this.$refs.tabController2.currentIndex = index;
+        //点击相应的分类页，实现子内容回到顶部
+        this.$refs.scroll.scroll.scrollTo(0, - this.tabOffsetTop,700)
       },
       backClick() {
         //通过this.$refs.ref值获取scroll组件对象
@@ -153,6 +155,7 @@
       loadMore() {
         this.getHomeGoods(this.currentType)
         this.$refs.scroll && this.$refs.scroll.scroll.finishPullUp()
+        this.$refs.scroll && this.$refs.scroll.refresh
       },
       swiperImageLoad() {
         //  获取tabController的tabOffsetTop
